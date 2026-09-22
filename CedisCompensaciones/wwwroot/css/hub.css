@@ -1,0 +1,436 @@
+/* wwwroot/css/hub.css */
+
+body {
+    background-color: #f8f9fa;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 100px; /* Modificado para hacer espacio a la barra */
+}
+
+/* Contenedor Superior (Botones de Acción) */
+.hub-header-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.hub-title {
+    color: #202124;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.hub-subtitle {
+    color: #5f6368;
+    margin-bottom: 40px;
+}
+
+.action-buttons-wrapper {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.btn-crear-espacio, .btn-unirse-espacio {
+    flex: 1;
+    text-decoration: none;
+    padding: 25px;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    color: white;
+}
+
+.btn-crear-espacio {
+    background-color: #202124;
+}
+
+.btn-unirse-espacio {
+    background-color: #1a73e8;
+}
+
+.btn-crear-espacio:hover, .btn-unirse-espacio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    color: white; /* Mantener texto blanco al hacer hover */
+}
+
+.btn-action-title {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}
+
+.btn-action-desc {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Contenedor Inferior (Tarjetas Mis Trabajos) */
+.hub-works-container {
+    max-width: 800px;
+    margin: 50px auto;
+}
+
+.section-title {
+    color: #202124;
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-bottom: 1px solid #dadce0;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+.cards-wrapper {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Estilo Tarjeta (Estilo Google Docs) */
+.work-card {
+    position: relative; /* NUEVO: Necesario para que el menú de 3 puntos se posicione bien */
+    width: 220px;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.work-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: #1a73e8;
+}
+
+.card-icon-area {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    border-top-left-radius: 8px; /* Mantiene el borde redondeado arriba */
+    border-top-right-radius: 8px;
+}
+
+.icon-gray { background-color: #f1f3f4; }
+.icon-green { background-color: #e6f4ea; }
+
+.card-info-area {
+    padding: 15px;
+}
+
+.card-title {
+    margin: 0 0 5px 0;
+    color: #202124;
+    font-size: 15px;
+}
+
+.card-role {
+    margin: 0;
+    color: #5f6368;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+/*======================================================*/
+
+/* Barra de Navegación Superior del Hub */
+.hub-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.hub-logo {
+    font-weight: bold;
+    color: #202124;
+    font-size: 18px;
+}
+
+.user-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-details {
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.btn-logout {
+    padding: 8px 16px;
+    background-color: #f1f3f4;
+    color: #202124;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-logout:hover {
+    background-color: #e8eaed;
+}
+
+/*=======================================*/
+/* ==========================================
+   MENÚ DE PERFIL ESTILO GOOGLE
+   ========================================== */
+.profile-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-pic-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+    object-fit: cover;
+}
+
+.profile-pic-btn:hover {
+    border-color: #d2e3fc;
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: white;
+    min-width: 280px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #dadce0;
+    z-index: 2000;
+    overflow: hidden;
+}
+
+.profile-dropdown.active {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #dadce0;
+}
+
+.dropdown-header img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+.dropdown-name {
+    margin: 0;
+    color: #202124;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.dropdown-email {
+    margin: 5px 0 0 0;
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.dropdown-actions {
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-btn {
+    padding: 12px 20px;
+    color: #3c4043;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.dropdown-btn:hover {
+    background-color: #f1f3f4;
+}
+
+.dropdown-btn span {
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+/* ==========================================
+   VENTANA MODAL (CONTRASEÑA DE ESPACIO)
+   ========================================== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(32, 33, 36, 0.6);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative;
+    text-align: left;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #5f6368;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #d93025;
+}
+
+.modal-title {
+    margin-top: 0;
+    color: #202124;
+    font-size: 20px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 12px;
+    margin: 15px 0 25px 0;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.btn-submit-modal {
+    width: 100%;
+    padding: 12px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-submit-modal:hover {
+    background-color: #1557b0;
+}
+
+/* ==========================================
+   MENÚ DE OPCIONES (3 PUNTITOS) EN TARJETAS
+   ========================================== */
+.btn-options-card {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 0 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    font-weight: bold;
+}
+
+.btn-options-card:hover {
+    background-color: #e8eaed;
+}
+
+.card-options-dropdown {
+    display: none;
+    position: absolute;
+    bottom: 40px;
+    right: 10px;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    width: 180px;
+    z-index: 10;
+    flex-direction: column;
+    border: 1px solid #dadce0;
+}
+
+.card-options-dropdown.show {
+    display: flex;
+}
+
+.options-category {
+    font-size: 11px;
+    color: #5f6368;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #f1f3f4;
+    border-top: 1px solid #f1f3f4;
+    margin: 0;
+}
+
+.card-options-item {
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #202124;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-align: left;
+    width: 100%;
+}
+
+.card-options-item:hover {
+    background-color: #f1f3f4;
+}
+
+.card-options-item.text-danger {
+    color: #d93025;
+    font-weight: bold;
+}

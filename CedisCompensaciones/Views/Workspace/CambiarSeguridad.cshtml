@@ -1,0 +1,21 @@
+@{ ViewData["Title"] = "Cambiar Seguridad de Área"; }
+
+<div style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <h3 style="color: #202124; text-align: center;">⚙️ Cambiar Contraseña de Operación</h3>
+    <p style="color: #5f6368; text-align: center; font-size: 14px;">Actualiza la contraseña compartida para capturar pólizas en este departamento.</p>
+
+    <form action="/Workspace/EjecutarCambioPassword" method="post" style="margin-top: 20px;">
+        <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+        
+        <label style="font-weight: bold; font-size: 14px;">Contraseña Actual</label>
+        <input type="password" name="passActual" required style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        
+        <label style="font-weight: bold; font-size: 14px;">Nueva Contraseña</label>
+        <input type="password" name="passNueva" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        
+        <button type="submit" style="width: 100%; padding: 10px; background-color: #1a73e8; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Actualizar Contraseña</button>
+    </form>
+    
+    <p style="color: green; text-align: center; margin-top: 15px; font-weight: bold;">@TempData["ExitoPass"]</p>
+    <p style="color: red; text-align: center; margin-top: 15px;">@TempData["ErrorPass"]</p>
+</div>

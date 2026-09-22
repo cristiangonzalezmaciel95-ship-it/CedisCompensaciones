@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CEDIS</title>
+    
+    <!-- Vinculamos tu nuevo CSS -->
+    <link rel="stylesheet" href="~/css/layout.css" />
+
+    <!-- AGREGA ESTA LÍNEA EXACTAMENTE AQUÍ -->
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+    <!-- MENÚ LATERAL -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>CEDIS WEB</h3>
+            <span style="font-size: 12px; color: #888;">Compensaciones</span>
+        </div>
+        
+        <!-- Usamos C# para leer el correo actual -->
+        @using System.Security.Claims
+        @{
+            var correoActual = User.FindFirstValue(ClaimTypes.Email);
+            bool esIngenieroCreador = correoActual == "cristiangonzalezmaciel95@gmail.com";
+        }
+
+
+      <ul class="nav-links">
+            <!-- Botón que todos ven una vez que ingresan a un área -->
+            <li><a href="/Workspace/Operacion?idDepto=@ViewBag.ID_Depto">🏠 Panel de Operación</a></li>
+
+            <!-- ESTO SOLO LO VERÁ EL SUPER ADMINISTRADOR DE ESTE ESPACIO -->
+            @if (ViewBag.EsAdmin != null && (bool)ViewBag.EsAdmin == true)
+            {
+                <li style="margin-top: 20px; font-size: 12px; color: #888; padding-left: 20px; text-transform: uppercase;">Administración</li>
+                <li><a href="/Workspace/CambiarSeguridad?idDepartamento=@ViewBag.ID_Depto">🔑 Cambiar Contraseña</a></li>
+                <li><a href="/Workspace/InvitarUsuarios?idDepartamento=@ViewBag.ID_Depto">📩 Invitar Usuarios</a></li>
+            }
+        </ul>
+        <div class="logout-box">
+            <a href="/Home/Salir" class="logout-btn">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div class="main-content">
+        <!-- Barra superior -->
+        <div class="topbar">
+            <div class="topbar-user">
+                <!-- Mostramos el nombre solo si el usuario está autenticado -->
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <span>Hola, @User.Identity.Name</span>
+                }
+            </div>
+        </div>
+
+        <!-- AQUÍ SE INYECTAN LAS DEMÁS PANTALLAS MÁGICAMENTE -->
+        <div class="content-area">
+            @RenderBody()
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+@model List<Dictionary<string, string>>
+@{
+    ViewData["Title"] = "Gestión de Accesos";
+}
+
+<!-- Vinculación del CSS -->
+<link rel="stylesheet" href="~/css/admin-accesos.css" />
+
+<div class="admin-container">
+    
+    <h2 class="admin-title">Compartir Sistema de Compensaciones</h2>
+    <p class="admin-subtitle">Administra quién tiene acceso al sistema y sus niveles de permiso.</p>
+
+    <!-- FORMULARIO PARA DAR ACCESO -->
+    <div class="invite-box">
+        <form action="/Admin/ConcederAcceso" method="post" class="invite-form">
+            <input type="email" name="correo" placeholder="Añadir personas (Correo Google)" required class="input-email" />
+            <input type="text" name="nombre" placeholder="Nombre (Opcional)" required class="input-name" />
+            
+            <select name="idRol" class="select-role">
+                <option value="1">Administrador</option>
+                <option value="2" selected>Validador</option>
+                <option value="3">Lector</option>
+            </select>
+            
+            <button type="submit" class="btn-invite">Dar Acceso</button>
+        </form>
+    </div>
+
+    <!-- LISTA DE PERSONAS CON ACCESO -->
+    <h3 class="list-title">Personas con acceso</h3>
+    
+    <div class="list-container">
+        @foreach (var usuario in Model)
+        {
+            bool tieneAcceso = usuario["Estatus"] == "True" || usuario["Estatus"] == "1";
+            string rowClass = tieneAcceso ? "user-row active" : "user-row inactive";
+            string nameClass = tieneAcceso ? "user-name" : "user-name struck";
+            
+            <div class="@rowClass">
+                
+                <div class="user-info-wrapper">
+                    <!-- Círculo con la inicial del nombre -->
+                    <div class="avatar">
+                        @(usuario["Nombre"].Substring(0,1).ToUpper())
+                    </div>
+                    <div>
+                        <div class="@nameClass">@usuario["Nombre"]</div>
+                        <div class="user-email">@usuario["Correo"]</div>
+                    </div>
+                </div>
+
+                <div class="user-actions">
+                    <span class="user-role">@usuario["Rol"]</span>
+                    
+                    <!-- BOTÓN PARA REVOCAR O DEVOLVER ACCESO -->
+                    <form action="/Admin/RevocarAcceso" method="post" class="form-inline">
+                        <input type="hidden" name="idUsuario" value="@usuario["ID"]" />
+                        
+                        @if(tieneAcceso)
+                        {
+                            <input type="hidden" name="nuevoEstatus" value="0" />
+                            <button type="submit" class="btn-revoke">Quitar acceso</button>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="nuevoEstatus" value="1" />
+                            <button type="submit" class="btn-restore">Restaurar acceso</button>
+                        }
+                    </form>
+                </div>
+                
+            </div>
+        }
+    </div>
+</div>

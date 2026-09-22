@@ -1,0 +1,161 @@
+@using System.Security.Claims
+@{ 
+    ViewData["Title"] = "Gestión de Usuarios"; 
+    // Obtenemos el correo del usuario que está navegando
+    var correoActual = User.FindFirstValue(ClaimTypes.Email);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/operacion.css" />
+    <link rel="stylesheet" href="~/css/login.css" />
+}
+
+<div class="workspace-header">
+    <div>
+        <h2 class="workspace-title">👥 Gestión de Equipo</h2>
+        <p class="workspace-subtitle">Invita nuevos colaboradores o administra los accesos actuales.</p>
+    </div>
+</div>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div class="admin-container">
+
+    <!-- 1. SECCIÓN DE INVITACIÓN -->
+    <div class="admin-section-card">
+        <h3 class="admin-section-title">📩 Enviar Nueva Invitación</h3>
+        
+        @if (TempData["ExitoInvitacion"] != null)
+        {
+            <div class="alert-success">@TempData["ExitoInvitacion"]</div>
+        }
+        @if (TempData["ErrorInvitacion"] != null)
+        {
+            <div class="alert-danger">@TempData["ErrorInvitacion"]</div>
+        }
+
+        <form action="/Workspace/ProcesarInvitacion" method="post" class="form-crear">
+            <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+            
+            <label class="form-label">Correo de Google del Invitado</label>
+            <input type="email" name="correoInvitado" placeholder="ejemplo@gmail.com" required class="form-input" />
+            
+            <label class="form-label">Asignar Rol en este Espacio</label>
+            <select name="idRol" class="form-select" required>
+                <option value="" disabled selected>-- Selecciona un rol --</option>
+                <option value="2">Editor / Supervisor (Puede modificar datos)</option>
+                <option value="3">Visualizador (Solo lectura)</option>
+            </select>
+            
+            <button type="submit" class="btn-google btn-dark">
+                Enviar Invitación y Contraseña por Correo
+            </button>
+        </form>
+    </div>
+
+    <!-- 2. SECCIÓN DE MIEMBROS CON ACCESO -->
+    <div class="admin-section-card">
+        <h3 class="admin-section-title">🔒 Miembros con Acceso Actual</h3>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Correo de Usuario</th>
+                    <th>Rol</th>
+                    <th>Fecha de Ingreso</th>
+                    <th style="text-align: center;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.Miembros != null)
+                {
+                    foreach (var miembro in ViewBag.Miembros)
+                    {
+                        <tr>
+                            <td class="fw-500">@miembro["Correo"]</td>
+                            <td class="text-muted">@miembro["Rol"]</td>
+                            <td class="text-muted">@miembro["Fecha"]</td>
+                            <td style="text-align: center;">
+                                
+                                <!-- VALIDACIÓN PARA EVITAR QUE SE BORRE A SÍ MISMO -->
+                                @if (miembro["Correo"] == correoActual)
+                                {
+                                    <span style="color: #5f6368; font-weight: bold; font-size: 12px; background-color: #f1f3f4; padding: 6px 12px; border-radius: 4px; display: inline-block;">
+                                        👑 Tú
+                                    </span>
+                                }
+                                else
+                                {
+                                    <form action="/Workspace/QuitarAcceso" method="post" onsubmit="return confirm('¿Estás seguro de revocar el acceso a este usuario?');">
+                                        <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+                                        <input type="hidden" name="idUsuario" value="@miembro["ID_Usuario"]" />
+                                        <button type="submit" class="btn-small-danger">
+                                            Revocar
+                                        </button>
+                                    </form>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 3. SECCIÓN DE SOLICITUDES PENDIENTES -->
+    <div class="admin-section-card">
+        <h3 class="admin-section-title text-danger">🔔 Solicitudes de Acceso Pendientes</h3>
+
+        @if (ViewBag.Solicitudes != null && ViewBag.Solicitudes.Count > 0)
+        {
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Correo Solicitante</th>
+                        <th>Fecha</th>
+                        <th>Asignar Rol y Aceptar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sol in ViewBag.Solicitudes)
+                    {
+                        <tr>
+                            <td class="fw-500">@sol["Correo"]</td>
+                            <td class="text-muted">@sol["Fecha"]</td>
+                            <td>
+                                <div class="table-form-row">
+                                    <form action="/Workspace/AceptarSolicitud" method="post" class="table-form-row" style="margin: 0;">
+                                        <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+                                        <input type="hidden" name="idSolicitud" value="@sol["ID_Solicitud"]" />
+                                        
+                                        <select name="idRol" class="table-select" required>
+                                            <option value="" disabled selected>-- Elige un Rol --</option>
+                                            <option value="2">Editor / Supervisor</option>
+                                            <option value="3">Visualizador</option>
+                                        </select>
+                                        
+                                        <button type="submit" class="btn-small-primary">
+                                            ✅ Aceptar
+                                        </button>
+                                    </form>
+
+                                    <form action="/Workspace/RechazarSolicitud" method="post" style="margin: 0;" onsubmit="return confirm('¿Estás seguro de rechazar esta solicitud?');">
+                                        <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+                                        <input type="hidden" name="idSolicitud" value="@sol["ID_Solicitud"]" />
+                                        <button type="submit" class="btn-small-danger">
+                                            ❌ Rechazar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="empty-message">No hay solicitudes pendientes en este momento.</p>
+        }
+    </div>
+</div>

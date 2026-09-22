@@ -1,0 +1,166 @@
+/* wwwroot/css/admin-accesos.css */
+
+/* Contenedor principal */
+.admin-container {
+    max-width: 800px;
+    margin: 40px auto;
+    font-family: Arial, sans-serif;
+}
+
+.admin-title {
+    color: #202124;
+}
+
+.admin-subtitle {
+    color: #5f6368;
+    margin-bottom: 30px;
+}
+
+/* Caja del formulario de invitar */
+.invite-box {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.invite-form {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+.input-email {
+    flex: 2;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-name {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.select-role {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn-invite {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-invite:hover {
+    background: #1557b0;
+}
+
+/* Lista de usuarios */
+.list-title {
+    color: #202124;
+    font-size: 16px;
+}
+
+.list-container {
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.user-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dadce0;
+}
+
+.user-row.active {
+    background: #fff;
+}
+
+.user-row.inactive {
+    background: #f1f3f4;
+}
+
+.user-info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #9c27b0;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #202124;
+}
+
+.user-name.struck {
+    text-decoration: line-through;
+}
+
+.user-email, .user-role {
+    color: #5f6368;
+    font-size: 14px;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Botones de acción (Revocar / Restaurar) */
+.form-inline {
+    margin: 0;
+}
+
+.btn-revoke {
+    background: transparent;
+    color: #d93025;
+    border: 1px solid #d93025;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-revoke:hover {
+    background: #fce8e6;
+}
+
+.btn-restore {
+    background: transparent;
+    color: #188038;
+    border: 1px solid #188038;
+    padding: 6px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-restore:hover {
+    background: #e6f4ea;
+}

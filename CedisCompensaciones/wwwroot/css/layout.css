@@ -1,0 +1,115 @@
+/* wwwroot/css/layout.css */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9;
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important; /* Fuerza la barra de desplazamiento sí o sí */
+    overflow-x: hidden;
+}
+
+/* MENÚ LATERAL (SIDEBAR) FIJO */
+.sidebar {
+    position: fixed; /* Esto lo ancla permanentemente a la izquierda */
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh; /* Altura completa de la pantalla */
+    background-color: #212529; 
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000; /* Asegura que esté por encima de todo */
+}
+
+.sidebar-header {
+    padding: 20px;
+    background-color: #1a1e21;
+    text-align: center;
+    border-bottom: 1px solid #343a40;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; 
+}
+
+.nav-links li {
+    border-bottom: 1px solid #343a40;
+}
+
+.nav-links a {
+    display: block;
+    padding: 15px 20px;
+    color: #c2c7d0;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    background-color: #343a40;
+    color: white;
+}
+
+.logout-box {
+    padding: 15px;
+    background-color: #1a1e21;
+}
+
+.logout-btn {
+    display: block;
+    text-align: center;
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+/* ÁREA PRINCIPAL DERECHA */
+.main-content {
+    margin-left: 250px; /* Empuja todo el contenido a la derecha para no taparlo con el menú fijo */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barra superior que se queda pegada al techo al bajar */
+.topbar {
+    background-color: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    
+    position: sticky; /* Se queda pegada arriba */
+    top: 0;
+    z-index: 100;
+}
+
+.topbar-user {
+    color: #5f6368;
+    font-weight: bold;
+}
+
+/* Área de trabajo */
+.content-area {
+    padding: 30px;
+    padding-bottom: 200px !important; /* Agrega un gran espacio en blanco al final de la página */
+}

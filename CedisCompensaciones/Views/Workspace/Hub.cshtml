@@ -1,0 +1,320 @@
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Hub de Trabajo";
+    Layout = null; 
+    
+    var correoActual = User.FindFirstValue(ClaimTypes.Email);
+    var nombreActual = User.FindFirstValue(ClaimTypes.Name);
+    bool esCreador = correoActual == "cristiangonzalezmaciel95@gmail.com";
+
+    // Intentamos obtener la foto de perfil de Google, si no hay, usamos una genérica
+    var fotoPerfil = User.Claims.FirstOrDefault(c => c.Type == "urn:google:picture" || c.Type == "picture")?.Value 
+                     ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+}
+@model List<Dictionary<string, string>>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CEDIS</title>
+    
+    <!-- Vinculamos el nuevo CSS -->
+    <link rel="stylesheet" href="~/css/hub.css" />
+</head>
+<body>
+
+    <!-- BARRA SUPERIOR (Con el nuevo menú de perfil) -->
+    <div class="hub-navbar">
+        <div class="hub-logo">CEDIS Hub</div>
+        
+        <div class="profile-menu-container">
+            <!-- La foto redonda en la esquina -->
+            <img src="@fotoPerfil" alt="Perfil" class="profile-pic-btn" id="btnProfilePic" onclick="toggleDropdown()" />
+            
+            <!-- La tarjeta desplegable -->
+            <div class="profile-dropdown" id="menuDropdown">
+                <div class="dropdown-header">
+                    <img src="@fotoPerfil" alt="Perfil Grande" />
+                    <h4 class="dropdown-name">@nombreActual</h4>
+                    <p class="dropdown-email">@correoActual</p>
+                </div>
+                <div class="dropdown-actions">
+                    <a href="/Home/CambiarCuenta" class="dropdown-btn">
+                        <span>🔄</span> Cambiar de cuenta
+                    </a>
+                    <a href="/Home/Salir" class="dropdown-btn">
+                        <span>🚪</span> Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR SUPERIOR (Botones de Acción) -->
+    <div class="hub-header-container">
+        <h2 class="hub-title">Sistema CEDIS Compensaciones</h2>
+        <p class="hub-subtitle">Selecciona o crea un espacio de trabajo para comenzar.</p>
+
+        <div class="action-buttons-wrapper">
+            <a href="/Workspace/CrearEspacio" class="btn-crear-espacio">
+                <h3 class="btn-action-title">👑 Crear Espacio</h3>
+                <p class="btn-action-desc">Inicia un nuevo proyecto como Super Admin</p>
+            </a>
+
+            <a href="javascript:void(0)" class="btn-unirse-espacio" onclick="abrirModalUnirse()">
+                <h3 class="btn-action-title">🔗 Unirse</h3>
+                <p class="btn-action-desc">Ingresar a un espacio con código de invitación</p>
+            </a>
+        </div>
+    </div>
+
+   <!-- CONTENEDOR INFERIOR (Tus Espacios Recientes) -->
+    <div class="hub-works-container">
+        <h3 class="section-title">MIS TRABAJOS</h3>
+        
+        <!-- Mensajes del sistema -->
+        @if (TempData["MensajeExito"] != null)
+        {
+            <div style="background-color: #e6f4ea; color: #188038; padding: 10px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; text-align: center;">
+                @TempData["MensajeExito"]
+            </div>
+        }
+        @if (TempData["ErrorWorkspace"] != null)
+        {
+            <div style="background-color: #fce8e6; color: #d93025; padding: 10px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; text-align: center;">
+                @TempData["ErrorWorkspace"]
+            </div>
+        }
+
+        <div class="cards-wrapper">
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var espacio in Model)
+                {
+                    <div class="work-card" style="position: relative;" onclick="abrirModalContrasena('@espacio["ID"]', '@espacio["Nombre"]')">
+                        <div class="card-icon-area icon-gray">
+                            <span>🏢</span>
+                        </div>
+                        <div class="card-info-area">
+                            <h4 class="card-title">@espacio["Nombre"]</h4>
+                            <p class="card-role">Rol: @espacio["Rol"]</p>
+                            
+                            @if(espacio.ContainsKey("Codigo") && (espacio["Rol"] == "1" || espacio["Rol"].Contains("Admin"))) 
+                            {
+                                <p style="margin-top: 5px; font-size: 12px; color: #1a73e8; font-weight: bold; background: #e8f0fe; padding: 4px; border-radius: 4px; display: inline-block;">
+                                    Código: @espacio["Codigo"]
+                                </p>
+                            }
+                        </div>
+
+                        <button type="button" class="btn-options-card" onclick="toggleOpcionesTarjeta(event, 'opciones-@espacio["ID"]')">⋮</button>
+                        
+                        <!-- Menú Desplegable -->
+                        <div class="card-options-dropdown" id="opciones-@espacio["ID"]">
+                            
+                            <p class="options-category">📥 Descargar</p>
+                            <a href="#" class="card-options-item" onclick="event.stopPropagation();">📄 Formato PDF</a>
+                            <a href="#" class="card-options-item" onclick="event.stopPropagation();">📊 Formato Excel</a>
+                            
+                            <!-- Lógica de roles para Acciones -->
+                            <p class="options-category" style="margin-top: 5px;">⚠️ Acción</p>
+                            @if(espacio["Rol"] == "1" || espacio["Rol"].Contains("Admin")) 
+                            {
+                                <!-- NUEVO: Ver Contraseña para Administradores -->
+                                <form action="/Workspace/VerContrasena" method="post" style="margin:0;" onclick="event.stopPropagation();">
+                                    <input type="hidden" name="idDepartamento" value="@espacio["ID"]" />
+                                    <button type="submit" class="card-options-item" style="color: #1a73e8; font-weight: bold;">🔑 Ver Contraseña</button>
+                                </form>
+
+                                <button type="button" class="card-options-item text-danger" onclick="abrirModalEliminar(event, '@espacio["ID"]', '@espacio["Nombre"]')">
+                                    🗑️ Eliminar Proyecto
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="card-options-item text-danger" onclick="abrirModalDarDeBaja(event, '@espacio["ID"]', '@espacio["Nombre"]')">
+                                    🚪 Darme de baja
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div style="width: 100%; text-align: center; padding: 40px; color: #5f6368;">
+                    <p>Aún no perteneces a ningún espacio de trabajo.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- EL MODAL DE CONTRASEÑA -->
+    <div class="modal-overlay" id="modalPassword">
+        <div class="modal-box">
+            <span class="modal-close" onclick="cerrarModal()">✖</span>
+            <h3 class="modal-title">🔐 Ingresar al Espacio</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 10px;">
+                Introduce la contraseña maestra para abrir: <strong id="modalNombreEspacio" style="color:#202124;"></strong>
+            </p>
+            
+            <form action="/Workspace/ValidarWorkspace" method="post">
+                <input type="hidden" id="modalIdDepto" name="idDepartamento" value="" />
+                <input type="password" name="contrasena" class="modal-input" placeholder="Escribe la contraseña..." required />
+                <button type="submit" class="btn-submit-modal">Desbloquear Área</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA UNIRSE A UN ESPACIO -->
+    <div class="modal-overlay" id="modalUnirse">
+        <div class="modal-box">
+            <span class="modal-close" onclick="cerrarModalUnirse()">✖</span>
+            <h3 class="modal-title">🔗 Unirse a un Espacio</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 10px;">
+                Pídele a tu administrador el código de acceso de 6 caracteres.
+            </p>
+            
+            <form action="/Workspace/EnviarSolicitudUnion" method="post">
+                <input type="text" name="codigoUnion" class="modal-input" placeholder="Ej: TRX9P2" required style="text-transform: uppercase;" maxlength="6" />
+                <button type="submit" class="btn-submit-modal">Enviar Solicitud</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA ELIMINAR PROYECTO (ADMINS) -->
+    <div class="modal-overlay" id="modalEliminar">
+        <div class="modal-box">
+            <span class="modal-close" onclick="cerrarModalEliminar()">✖</span>
+            <h3 class="modal-title" style="color: #d93025;">⚠️ Eliminar Proyecto</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 10px;">
+                Estás a punto de eliminar <strong id="modalNombreEliminar" style="color:#202124;"></strong>. Esta acción borrará todos los registros y <strong style="color: #d93025;">no se puede deshacer</strong>.
+            </p>
+            <p style="color: #202124; font-size: 13px; font-weight: bold; margin-bottom: 5px;">
+                Ingresa la contraseña del área para confirmar:
+            </p>
+            
+            <form action="/Workspace/EliminarProyecto" method="post">
+                <input type="hidden" id="modalIdDeptoEliminar" name="idDepartamento" value="" />
+                <input type="password" name="contrasenaConfirmacion" class="modal-input" placeholder="Contraseña maestra..." required />
+                <button type="submit" class="btn-submit-modal" style="background-color: #d93025;">🗑️ Eliminar Definitivamente</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA DARSE DE BAJA (USUARIOS) -->
+    <div class="modal-overlay" id="modalDarDeBaja">
+        <div class="modal-box">
+            <span class="modal-close" onclick="cerrarModalDarDeBaja()">✖</span>
+            <h3 class="modal-title" style="color: #d93025;">🚪 Darme de baja</h3>
+            <p style="color: #5f6368; font-size: 14px; margin-bottom: 20px;">
+                ¿Estás seguro de que deseas salir de <strong id="modalNombreDarDeBaja" style="color:#202124;"></strong>? Ya no tendrás acceso a la información y el administrador tendrá que invitarte de nuevo si deseas regresar.
+            </p>
+            
+            <form action="/Workspace/DarDeBaja" method="post">
+                <input type="hidden" id="modalIdDeptoDarDeBaja" name="idDepartamento" value="" />
+                <button type="submit" class="btn-submit-modal" style="background-color: #d93025;">Confirmar y Salir</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS AL FINAL DEL BODY -->
+    <script>
+        // Lógica del Menú de Perfil
+        function toggleDropdown() {
+            document.getElementById("menuDropdown").classList.toggle("active");
+        }
+
+        // Lógica de los 3 puntitos en las tarjetas
+        function toggleOpcionesTarjeta(event, menuId) {
+            event.stopPropagation(); // Evita abrir el modal de contraseña
+            
+            var dropdowns = document.getElementsByClassName("card-options-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].id !== menuId) {
+                    dropdowns[i].classList.remove('show');
+                }
+            }
+            document.getElementById(menuId).classList.toggle('show');
+        }
+
+        // Lógica de Modales
+        function abrirModalContrasena(idDepto, nombreDepto) {
+            document.getElementById('modalIdDepto').value = idDepto;
+            document.getElementById('modalNombreEspacio').innerText = nombreDepto;
+            document.getElementById('modalPassword').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalPassword').classList.remove('active');
+        }
+
+        function abrirModalUnirse() {
+            document.getElementById('modalUnirse').classList.add('active');
+        }
+
+        function cerrarModalUnirse() {
+            document.getElementById('modalUnirse').classList.remove('active');
+        }
+
+        function abrirModalEliminar(event, idDepto, nombreDepto) {
+            event.stopPropagation(); 
+            document.getElementById('modalIdDeptoEliminar').value = idDepto;
+            document.getElementById('modalNombreEliminar').innerText = nombreDepto;
+            
+            var dropdowns = document.getElementsByClassName("card-options-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].classList.remove('show');
+            }
+            document.getElementById('modalEliminar').classList.add('active');
+        }
+
+        function cerrarModalEliminar() {
+            document.getElementById('modalEliminar').classList.remove('active');
+        }
+
+        function abrirModalDarDeBaja(event, idDepto, nombreDepto) {
+            event.stopPropagation(); 
+            document.getElementById('modalIdDeptoDarDeBaja').value = idDepto;
+            document.getElementById('modalNombreDarDeBaja').innerText = nombreDepto;
+            
+            var dropdowns = document.getElementsByClassName("card-options-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].classList.remove('show');
+            }
+            document.getElementById('modalDarDeBaja').classList.add('active');
+        }
+
+        function cerrarModalDarDeBaja() {
+            document.getElementById('modalDarDeBaja').classList.remove('active');
+        }
+
+        // Cerrar cosas si se hace clic afuera
+        window.onclick = function(event) {
+            // Cerrar menú de perfil
+            if (!event.target.matches('.profile-pic-btn')) {
+                var dropdownsPerfil = document.getElementsByClassName("profile-dropdown");
+                for (var i = 0; i < dropdownsPerfil.length; i++) {
+                    dropdownsPerfil[i].classList.remove('active');
+                }
+            }
+            
+            // Cerrar menú de los 3 puntitos
+            if (!event.target.matches('.btn-options-card')) {
+                var dropdownsTarjeta = document.getElementsByClassName("card-options-dropdown");
+                for (var i = 0; i < dropdownsTarjeta.length; i++) {
+                    dropdownsTarjeta[i].classList.remove('show');
+                }
+            }
+
+            // Cerrar modales si hace clic en lo oscuro
+            if (event.target.matches('#modalPassword')) { cerrarModal(); }
+            if (event.target.matches('#modalUnirse')) { cerrarModalUnirse(); }
+            if (event.target.matches('#modalEliminar')) { cerrarModalEliminar(); }
+            if (event.target.matches('#modalDarDeBaja')) { cerrarModalDarDeBaja(); }
+        }
+    </script>
+</body>
+</html>

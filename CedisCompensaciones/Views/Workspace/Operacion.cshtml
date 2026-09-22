@@ -1,0 +1,299 @@
+@{
+    ViewData["Title"] = "Operaciones CEDIS";
+}
+@model List<Dictionary<string, string>>
+
+<link rel="stylesheet" href="~/css/operacion.css" />
+<style>
+    /* Estilo para cuando seleccionas una fila (estilo Windows Forms) */
+    .data-grid tbody tr.selected-row {
+        background-color: #d2e3fc !important;
+        border: 2px solid #1a73e8;
+    }
+    .data-grid tbody tr {
+        cursor: pointer; /* Hace que el puntero cambie a una manita indicando que es clickable */
+    }
+
+    /* Estilos para los botones del formulario */
+    .botones-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-accion {
+        border: none; padding: 12px; width: 100%;
+        border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;
+        transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    .btn-primario { background-color: #1a73e8; color: white; box-shadow: 0 2px 4px rgba(26,115,232,0.3); }
+    .btn-primario:hover { background-color: #1557b0; }
+    
+    .btn-warning { background-color: #fbbc04; color: #202124; box-shadow: 0 2px 4px rgba(251,188,4,0.3); }
+    .btn-warning:hover { background-color: #f2a600; }
+    
+    .btn-danger { background-color: #ea4335; color: white; box-shadow: 0 2px 4px rgba(234,67,53,0.3); }
+    .btn-danger:hover { background-color: #ce3a2e; }
+    
+    .btn-secundario { background-color: #f1f3f4; color: #5f6368; border: 1px solid #dadce0; }
+    .btn-secundario:hover { background-color: #e8eaed; }
+</style>
+
+<div class="operacion-layout">
+    
+    <!-- PANEL IZQUIERDO: FORMULARIO -->
+    <div class="panel-formulario">
+        <a href="/Workspace/Hub" class="btn-volver">⬅ Volver al Hub</a>
+        
+        <div class="form-header">
+            <h2 id="tituloFormulario">@ViewBag.NombreEspacio</h2>
+            <p id="subtituloFormulario">Captura Operativa CEDIS</p>
+        </div>
+        
+        @if (TempData["MensajeExito"] != null) { <div class="alert-success">@TempData["MensajeExito"]</div> }
+        @if (TempData["ErrorWorkspace"] != null) { <div class="alert-danger">@TempData["ErrorWorkspace"]</div> }
+
+        <!-- FORMULARIO PRINCIPAL (Insertar o Actualizar) -->
+        <form id="formOperacion" action="/Workspace/InsertarOperacion" method="post">
+            <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+            <input type="hidden" id="idRegistro" name="idRegistro" value="" />
+            
+            <fieldset class="form-section">
+                <legend>1. Clasificación</legend>
+                <div class="grid-2-col">
+                    <div class="form-group">
+                        <label class="form-label">Tipo *</label>
+                        <select id="Tipo" name="Tipo" class="form-select" required>
+                            <option value="Faltante">Faltante</option>
+                            <option value="Sobrante">Sobrante</option>
+                            <option value="Póliza">Póliza</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">Fecha *</label><input type="date" id="Fecha" name="Fecha" class="form-input" required value="@DateTime.Now.ToString("yyyy-MM-dd")" /></div>
+                </div>
+                <div class="grid-3-col">
+                    <div class="form-group"><label class="form-label">Mes</label><input type="text" id="Mes" name="Mes" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Tienda/Bod</label><input type="text" id="Tienda_Bodega" name="Tienda_Bodega" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Centro</label><input type="text" id="Centro" name="Centro" class="form-input" /></div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>2. Producto</legend>
+                <div class="grid-2-col">
+                    <div class="form-group"><label class="form-label">Cant. *</label><input type="number" id="Cantidad" name="Cantidad" class="form-input" required /></div>
+                    <div class="form-group"><label class="form-label">Código</label><input type="text" id="Codigo" name="Codigo" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Artículo</label><input type="text" id="Articulo" name="Articulo" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Marca/Dep</label><input type="text" id="Marca_Dep" name="Marca_Dep" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Modelo/Clase</label><input type="text" id="Modelo_Clase" name="Modelo_Clase" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Familia</label><input type="text" id="Familia" name="Familia" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">SKU</label><input type="text" id="SKU" name="SKU" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Vale</label><input type="text" id="Vale" name="Vale" class="form-input" /></div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>3. Control y Finanzas</legend>
+                <div class="grid-2-col">
+                    <div class="form-group"><label class="form-label">Póliza f</label><input type="text" id="Poliza" name="Poliza" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Póliza s</label><input type="text" id="Poliza_Referencia" name="Poliza_Referencia" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Precio U. ($)</label><input type="number" id="Precio_Unidad" step="0.01" name="Precio_Unidad" class="form-input" /></div>
+                    <div class="form-group"><label class="form-label">Precio V. ($)</label><input type="number" id="Precio_Venta" step="0.01" name="Precio_Venta" class="form-input" /></div>
+                </div>
+                <div class="form-group"><label class="form-label">Concepto *</label><input type="text" id="Concepto" name="Concepto" class="form-input" required /></div>
+                <div class="form-group"><label class="form-label">Comentarios / Correos</label><input type="text" id="Comentarios" name="Comentarios" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">S.A Seguimientos / Autorización</label><input type="text" id="Autorizacion" name="Autorizacion" class="form-input" /></div>
+            </fieldset>
+
+            <!-- CONTENEDOR DE BOTONES DINÁMICOS -->
+            <div class="botones-container">
+                <button type="submit" id="btnInsertar" class="btn-accion btn-primario">➕ Insertar Movimiento</button>
+                <button type="submit" id="btnActualizar" class="btn-accion btn-warning" style="display:none;">💾 Actualizar Cambios</button>
+                <button type="button" id="btnEliminar" class="btn-accion btn-danger" style="display:none;" onclick="confirmarEliminacion()">🗑️ Eliminar Registro</button>
+                <button type="button" id="btnCancelar" class="btn-accion btn-secundario" style="display:none;" onclick="cancelarEdicion()">✖ Cancelar Selección</button>
+            </div>
+        </form>
+
+        <!-- FORMULARIO OCULTO PARA ELIMINAR (Por seguridad y estructura) -->
+        <form id="formEliminar" action="/Workspace/EliminarOperacion" method="post" style="display:none;">
+            <input type="hidden" name="idDepartamento" value="@ViewBag.ID_Depto" />
+            <input type="hidden" id="idRegistroEliminar" name="idRegistro" value="" />
+        </form>
+    </div>
+
+    <!-- PANEL DERECHO: GRID DE DATOS -->
+    <div class="panel-grid">
+        <h3 style="margin-top:0; color:#202124;">Historial de Registros</h3>
+        <div class="grid-container">
+            <div class="grid-scroll-container">
+                <table class="data-grid">
+                    <thead>
+                        <tr>
+                            <!-- YA NO HAY COLUMNA DE ACCIONES, IGUAL QUE EXCEL -->
+                            <th>ID</th>
+                            <th>mes</th>
+                            <th>TIENDA O BODEGA</th>
+                            <th>Póliza f</th>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Cant.</th>
+                            <th>Articulo</th>
+                            <th>MARCA O DEP</th>
+                            <th>MODELO O CLASE</th>
+                            <th>FAMILIA</th>
+                            <th>Código</th>
+                            <th>VALE</th>
+                            <th>PRECIO DE UNIDAD</th>
+                            <th>Precio de venta</th>
+                            <th>Centro</th>
+                            <th>Concepto</th>
+                            <th>COMENTARIOS,CORREOS...</th>
+                            <th>POLIZA s</th>
+                            <th> SKU</th>
+                            <th>S.A DE SEGUIMIENTOS...</th>
+                            <th>FECHA DE REGISTRO</th>
+                            <th style="background-color: #e8f0fe;">Responsable</th>
+                        </tr>
+                    </thead>
+                   <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            foreach (var op in Model)
+                            {
+                                <!-- TODA LA FILA ES UN BOTÓN (OnClick) -->
+                                <tr onclick="seleccionarFila(this)" title="Clic para ver o editar registro"
+                                    data-id="@op["ID_Registro"]" data-tipo="@op["Tipo"]" data-fecha="@(!string.IsNullOrEmpty(op["Fecha"]) ? Convert.ToDateTime(op["Fecha"]).ToString("yyyy-MM-dd") : "")"
+                                    data-mes="@op["Mes"]" data-tienda="@op["Tienda_Bodega"]" data-centro="@op["Centro"]"
+                                    data-cantidad="@op["Cantidad"]" data-codigo="@op["Codigo"]" data-articulo="@op["Articulo"]"
+                                    data-marca="@op["Marca_Dep"]" data-modelo="@op["Modelo_Clase"]" data-familia="@op["Familia"]"
+                                    data-sku="@op["SKU"]" data-vale="@op["Vale"]" data-poliza="@op["Poliza"]"
+                                    data-polizas="@op["Poliza_Referencia"]" data-preciou="@op["Precio_Unidad"]"
+                                    data-preciov="@op["Precio_Venta"]" data-concepto="@op["Concepto"]"
+                                    data-comentarios="@op["Comentarios"]" data-autorizacion="@op["Autorizacion"]">
+                                    
+                                    <td style="color:#5f6368; font-weight:bold;">@op["ID_Registro"]</td>
+                                    <td>@op["Mes"]</td>
+                                    <td>@op["Tienda_Bodega"]</td>
+                                    <td>@op["Poliza"]</td>
+                                    <td>@(string.IsNullOrEmpty(op["Fecha"]) ? "" : Convert.ToDateTime(op["Fecha"]).ToString("dd/MM/yyyy"))</td>
+                                    <td>
+                                        @{
+                                            string claseBadge = op["Tipo"].ToLower() == "póliza" || op["Tipo"].ToLower() == "poliza" ? "badge-poliza" : 
+                                                                op["Tipo"].ToLower() == "faltante" ? "badge-faltante" : "badge-sobrante";
+                                        }
+                                        <span class="badge @claseBadge">@op["Tipo"]</span>
+                                    </td>
+                                    <td>@op["Cantidad"]</td>
+                                    <td>@op["Articulo"]</td>
+                                    <td>@op["Marca_Dep"]</td>
+                                    <td>@op["Modelo_Clase"]</td>
+                                    <td>@op["Familia"]</td>
+                                    <!-- AQUÍ ESTABA EL ERROR: Ya dice "Codigo" sin acento -->
+                                    <td>@op["Codigo"]</td> 
+                                    <td>@op["Vale"]</td>
+                                    <td style="color:#188038; font-weight:600;">$@op["Precio_Unidad"]</td>
+                                    <td style="color:#188038; font-weight:600;">$@op["Precio_Venta"]</td>
+                                    <td>@op["Centro"]</td>
+                                    <td>@op["Concepto"]</td>
+                                    <td>@op["Comentarios"]</td>
+                                    <td>@op["Poliza_Referencia"]</td>
+                                    <td>@op["SKU"]</td>
+                                    <td>@op["Autorizacion"]</td>
+                                    <td style="font-size: 12px;">@(string.IsNullOrEmpty(op["Fecha_Registro"]) ? "" : Convert.ToDateTime(op["Fecha_Registro"]).ToString("dd/MM/yyyy HH:mm"))</td>
+                                    <td style="font-size:11px; color:#1a73e8; background-color: #f8f9fa;">@op["Responsable"]</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="23" style="text-align: center; padding: 40px; color: #5f6368;">Aún no hay movimientos registrados.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función que se ejecuta al hacer clic en CUALQUIER PARTE de una fila
+    function seleccionarFila(tr) {
+        // 1. Quitar el color azul a todas las filas
+        document.querySelectorAll('.data-grid tbody tr').forEach(row => {
+            row.classList.remove('selected-row');
+        });
+        
+        // 2. Pintar de azul la fila a la que se le dio clic
+        tr.classList.add('selected-row');
+
+        // 3. Extraer los datos guardados en la fila
+        const data = tr.dataset;
+
+        // 4. Llenar el formulario de la izquierda
+        document.getElementById("idRegistro").value = data.id;
+        document.getElementById("Tipo").value = data.tipo;
+        document.getElementById("Fecha").value = data.fecha;
+        document.getElementById("Mes").value = data.mes;
+        document.getElementById("Tienda_Bodega").value = data.tienda;
+        document.getElementById("Centro").value = data.centro;
+        
+        document.getElementById("Cantidad").value = data.cantidad;
+        document.getElementById("Codigo").value = data.codigo;
+        document.getElementById("Articulo").value = data.articulo;
+        document.getElementById("Marca_Dep").value = data.marca;
+        document.getElementById("Modelo_Clase").value = data.modelo;
+        document.getElementById("Familia").value = data.familia;
+        document.getElementById("SKU").value = data.sku;
+        document.getElementById("Vale").value = data.vale;
+
+        document.getElementById("Poliza").value = data.poliza;
+        document.getElementById("Poliza_Referencia").value = data.polizas;
+        document.getElementById("Precio_Unidad").value = data.preciou;
+        document.getElementById("Precio_Venta").value = data.preciov;
+        document.getElementById("Concepto").value = data.concepto;
+        document.getElementById("Comentarios").value = data.comentarios;
+        document.getElementById("Autorizacion").value = data.autorizacion;
+
+        // 5. Configurar el ID para el botón oculto de eliminar
+        document.getElementById("idRegistroEliminar").value = data.id;
+
+        // 6. Cambiar el comportamiento de los botones y el título
+        document.getElementById("formOperacion").action = "/Workspace/ActualizarOperacion";
+        document.getElementById("subtituloFormulario").innerHTML = "Modo Edición - Registro <strong style='color:#d93025;'>#" + data.id + "</strong>";
+        
+        // Ocultar Insertar, Mostrar los demás
+        document.getElementById("btnInsertar").style.display = "none";
+        document.getElementById("btnActualizar").style.display = "block";
+        document.getElementById("btnEliminar").style.display = "block";
+        document.getElementById("btnCancelar").style.display = "block";
+    }
+
+    function cancelarEdicion() {
+        // Quitar selección de tabla
+        document.querySelectorAll('.data-grid tbody tr').forEach(row => {
+            row.classList.remove('selected-row');
+        });
+
+        // Limpiar formulario y resetear configuraciones
+        document.getElementById("formOperacion").reset();
+        document.getElementById("idRegistro").value = "";
+        document.getElementById("idRegistroEliminar").value = "";
+        
+        document.getElementById("formOperacion").action = "/Workspace/InsertarOperacion";
+        document.getElementById("subtituloFormulario").innerText = "Captura Operativa CEDIS";
+        
+        // Mostrar Insertar, Ocultar los demás
+        document.getElementById("btnInsertar").style.display = "block";
+        document.getElementById("btnActualizar").style.display = "none";
+        document.getElementById("btnEliminar").style.display = "none";
+        document.getElementById("btnCancelar").style.display = "none";
+    }
+
+    function confirmarEliminacion() {
+        if (confirm("¿Estás seguro de que deseas eliminar este registro?\n\nNo se borrará físicamente, se guardará en la Bitácora de Auditoría.")) {
+            document.getElementById("formEliminar").submit();
+        }
+    }
+</script>

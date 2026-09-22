@@ -1,0 +1,162 @@
+/* ==========================================
+   CONFIGURACIÓN GENERAL (INTEGRADA AL LAYOUT)
+   ========================================== */
+.operacion-layout {
+    display: flex;
+    /* Se ajusta al alto de la pantalla restando el topbar y los paddings */
+    height: calc(100vh - 140px); 
+    min-height: 650px;
+    gap: 20px; /* Separación limpia entre formulario y tabla */
+}
+
+/* ==========================================
+   PANEL IZQUIERDO: FORMULARIO TIPO WINDOWS FORMS
+   ========================================== */
+.panel-formulario {
+    width: 30%;
+    min-width: 360px;
+    background-color: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow-y: auto; /* Scroll independiente si el formulario es muy largo */
+    display: flex;
+    flex-direction: column;
+}
+
+.form-header { margin-bottom: 25px; }
+.form-header h2 { margin: 0 0 5px 0; color: #202124; font-size: 22px; }
+.form-header p { margin: 0; color: #5f6368; font-size: 14px; }
+
+.form-section {
+    border: 1px solid #d2d6da;
+    border-radius: 6px;
+    padding: 18px 15px 15px 15px;
+    margin-bottom: 18px;
+    background-color: #fcfcfc;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.form-section legend {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a73e8;
+    background: #fff;
+    padding: 4px 10px;
+    border: 1px solid #d2d6da;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.form-group { margin-bottom: 12px; }
+.form-label {
+    display: block; font-size: 12px; font-weight: 600; color: #495057; margin-bottom: 5px;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #212529;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: #1a73e8;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+}
+
+.grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.btn-insertar {
+    background-color: #1a73e8;
+    color: white; border: none; padding: 12px; width: 100%;
+    border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 10px; transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(26,115,232,0.3);
+}
+
+.btn-insertar:hover {
+    background-color: #1557b0; box-shadow: 0 4px 6px rgba(26,115,232,0.4);
+}
+
+.btn-volver {
+    background-color: transparent; color: #5f6368; border: 1px solid #dadce0;
+    padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 13px;
+    display: inline-block; margin-bottom: 20px; text-align: center; font-weight: 600;
+}
+.btn-volver:hover { background-color: #f1f3f4; }
+
+/* ==========================================
+   PANEL DERECHO: DATAGRIDVIEW (TABLA ESTILO EXCEL)
+   ========================================== */
+.panel-grid {
+    width: 70%;
+    flex-grow: 1;
+    background-color: #ffffff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-container {
+    border: 1px solid #c0c6cc;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-scroll-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    height: 100%;
+    white-space: nowrap;
+}
+
+.data-grid { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.data-grid th {
+    background-color: #e3e5e8; color: #3c4043; font-weight: 700; font-size: 11px;
+    text-transform: uppercase; text-align: left; padding: 10px 12px;
+    border: 1px solid #c0c6cc; position: sticky; top: 0; z-index: 2;
+}
+
+.data-grid td {
+    padding: 8px 12px; color: #202124; border: 1px solid #dee2e6;
+}
+
+.data-grid tbody tr:nth-child(even) { background-color: #f8f9fa; }
+.data-grid tbody tr:nth-child(odd) { background-color: #ffffff; }
+.data-grid tbody tr:hover { background-color: #e8f0fe !important; }
+
+/* Etiquetas dinámicas (Badges) */
+.badge {
+    padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 11px;
+    text-transform: uppercase; display: inline-block; text-align: center;
+}
+.badge-poliza { background-color: #e8f0fe; color: #1a73e8; border: 1px solid #d2e3fc; }
+.badge-faltante { background-color: #fce8e6; color: #d93025; border: 1px solid #fad2cf; }
+.badge-sobrante { background-color: #e6f4ea; color: #188038; border: 1px solid #ceead6; }
+
+/* Alertas */
+.alert-success {
+    background-color: #e6f4ea; color: #188038; border: 1px solid #ceead6;
+    padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: 600; font-size: 13px; text-align: center;
+}
+.alert-danger {
+    background-color: #fce8e6; color: #d93025; border: 1px solid #fad2cf;
+    padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: 600; font-size: 13px; text-align: center;
+}
